@@ -7,6 +7,8 @@
 using namespace std;
 using namespace std::chrono;
 
+// TODO - vector vs array for storing solutions
+
 // Vector printing function for readability and debugging
 void print_mat(vector<long>& vc, int dimension) {
     for (int i = 0; i < dimension; i++) {
@@ -16,6 +18,7 @@ void print_mat(vector<long>& vc, int dimension) {
 }
 
 // Generate random solution of size 100
+// TODO - change to vector pointer so don't recreate a new vector every time
 vector<long> randsol(int dim) {
     // Define random number generator
     unsigned seed = chrono::system_clock::now().time_since_epoch().count();
@@ -35,17 +38,25 @@ vector<long> randsol(int dim) {
     return sol;
 }
 
-// Karmarkar-Karp algorithm
-int kk() {}
+// Karmarkar-Karp algorithm: returns residue of given input.
+int kk(vector<long>& sol) {}
 
 // Repeated random algorithm
-void rrand(vector<long>& sol, int iters) {}
+void rrand(vector<long>& sol, int iters) {
+    for (int i = 0; i < iters; i++) {
+        vector<long> newsol = randsol(100);
+        if (kk(newsol) < kk(sol)) {
+            sol = newsol;
+        }
+    }
+    return;
+}
 
 // Hill climbing algorithm
-void hc(vector<long>& sol) {}
+void hc(vector<long>& sol, int iters) {}
 
 // Simulated annealing algorithm
-void anneal(vector<long>& sol) {}
+void anneal(vector<long>& sol, int iters) {}
 
 int main(int argc, char* argv[]) {
     return 0;
