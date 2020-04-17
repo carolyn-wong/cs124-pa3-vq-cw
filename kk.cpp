@@ -35,7 +35,6 @@ vector<long> randinst(int dim) {
     for (int i = 0; i < dim; i++) {
         sol[i] = distribution(generator);
     }
-
     return sol;
 }
 
@@ -72,8 +71,45 @@ void hc(vector<long>& inst, vector<long>& sol, int iters, int repr) {
     return;
 }
 
-// Simulated annealing algorithm
-void anneal(vector<long>& inst, vector<long>& sol, int iters, int repr) {}
+// Simulated annealing algorithm. Returns best solution sol2 seen so far.
+void anneal(vector<long>& inst, vector<long>& sol2, int iters, int repr) {
+    // Initialize random number generator for probabilities
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    std::mt19937 generator(seed);
+    std::uniform_real_distribution<double> distribution(0.0, 1.0);
+
+    // Create S by copying original random solution S''
+    // TODO see if can avoid copying values into new vector
+    vector<long> sol(sol2.begin(), sol2.end());
+
+    // Residue values for S, S', S''
+    int res = kk(sol);
+    int res1;
+    int res2 = res;
+
+    for (int i = 0; i < iters; i++) {
+        double cooling = pow(10, 10) * pow(0.8, floor(i / 300));
+        vector<long> sol1 = neighbor(sol, repr);
+        res1 = kk(sol1);
+        // residue(S') < residue(S)
+        if (res1 < res) {
+            sol = sol1;
+            res = res1;
+        } else {
+            double prob = exp(-(res1 - res) / cooling);
+            if (distribution(generator) < prob) {
+                sol = sol1;
+                res = res1;
+            }
+        }
+        // residue(S) < residue(S'')
+        if (res < res2) {
+            sol2 = sol;
+            res2 = res;
+        }
+    }
+    return;
+}
 
 int main(int argc, char* argv[]) {
     return 0;
