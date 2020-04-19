@@ -1,7 +1,9 @@
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <numeric>
 #include <random>
 
 using namespace std;
@@ -11,7 +13,8 @@ const int STD = 0;
 const int PP = 1;
 
 // TODO - vector vs array for storing solutions
-// TODO - implement random soln and neighbor generator for both representations
+// TODO - implement KK algorithm
+// TODO - improve efficiency of generating random indices in range [1, n]
 
 // Vector printing function for readability and debugging
 void print_mat(vector<long>& vc, int dimension) {
@@ -22,8 +25,7 @@ void print_mat(vector<long>& vc, int dimension) {
 }
 
 // Generate random instance of number partition problem of given dims
-// TODO - change to vector pointer so don't recreate a new vector every time
-vector<long> randinst(int dim) {
+void randinst(vector<long>& inst, int dim) {
     // Define random number generator
     unsigned seed = chrono::system_clock::now().time_since_epoch().count();
     mt19937_64 generator(seed);
@@ -33,12 +35,9 @@ vector<long> randinst(int dim) {
     std::uniform_int_distribution<long> distribution(1, maxval);
 
     // Fill solution with random values
-    vector<long> sol;
-    sol.resize(dim);
     for (int i = 0; i < dim; i++) {
-        sol[i] = distribution(generator);
+        inst[i] = distribution(generator);
     }
-    return sol;
 }
 
 // Returns random solution of given dimension and representation
@@ -68,48 +67,71 @@ void randsol(vector<int>& newsol, int dim, int repr) {
 }
 
 // Returns neighboring solution for given representation
-// TODO - make copy of solution and return pointer
-vector<long> neighbor(vector<int>& sol,
-                      vector<int>& newsol,
-                      int dims,
-                      int repr) {}
+void neighbor(vector<int>& sol, vector<int>& newsol, int dim, int repr) {
+    // Initialize random number generator
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    std::mt19937 generator(seed);
+
+    // Generate vector of values 1 through n
+    // TODO - see if can make this more efficient
+    vector<int> randInd;
+    randInd.resize(dim);
+    iota(randInd.begin(), randInd.end(), 1);
+    shuffle(randInd.begin(), randInd.end(), generator);
+
+    // Choose two random indices i, j from [1, n] with i != j
+    int i = randInd[0];
+    int j = randInd[1];
+
+    // Standard representation
+    if (repr == STD) {
+        std::bernoulli_distribution distribution(0.5);
+        // Set si to -si, set sj to -sj with probability 0.5
+        newsol[i] = -1 * newsol[i];
+        if (distribution(generator) < 0.5) {
+            newsol[j] = -1 * newsol[j];
+        }
+    }
+    // Prepartioning representation
+    else {
+        newsol[i] = j;
+    }
+}
 
 // Karmarkar-Karp algorithm: returns residue of given input, representation.
-int kk(vector<long>& inpt) {}
+int kk(vector<long>& inst, vector<int>& sol, int repr) {}
 
 // Repeated random algorithm
-void rrand(vector<long>& inst,
-           vector<int>& sol,
-           int dims,
-           int iters,
-           int repr) {
+void rrand(vector<long>& inst, vector<int>& sol, int dim, int iters, int repr) {
     vector<int> newsol;
-    newsol.resize(dims);
+    newsol.resize(dim);
     for (int i = 0; i < iters; i++) {
         // Generate random solution
-        randsol(newsol, dims, repr);
-        if (kk(newsol) < kk(sol)) {
+        randsol(newsol, dim, repr);
+        if (kk(inst, newsol, repr) < kk(inst, sol, repr)) {
             sol = newsol;
         }
     }
-    return;
 }
 
 // Hill climbing algorithm
-void hc(vector<long>& inst, vector<int>& sol, int dims, int iters, int repr) {
+void hc(vector<long>& inst, vector<int>& sol, int dim, int iters, int repr) {
     vector<int> newsol;
-    newsol.resize(dims);
+    newsol.resize(dim);
     for (int i = 0; i < iters; i++) {
-        neighbor(sol, newsol, dims, repr);
-        if (kk(newsol) < kk(sol)) {
+        neighbor(sol, newsol, dim, repr);
+        if (kk(inst, newsol, repr) < kk(inst, sol, repr)) {
             sol = newsol;
         }
     }
-    return;
 }
 
 // Simulated annealing algorithm. Returns best solution sol2 seen so far.
-void anneal(vector<long>& inst, vector<long>& sol2, int iters, int repr) {
+void anneal(vector<long>& inst,
+            vector<int>& sol2,
+            int dim,
+            int iters,
+            int repr) {
     // Initialize random number generator for probabilities
     unsigned seed = chrono::system_clock::now().time_since_epoch().count();
     std::mt19937 generator(seed);
@@ -117,17 +139,20 @@ void anneal(vector<long>& inst, vector<long>& sol2, int iters, int repr) {
 
     // Create S by copying original random solution S''
     // TODO see if can avoid copying values into new vector
-    vector<long> sol(sol2.begin(), sol2.end());
+    vector<int> sol(sol2.begin(), sol2.end());
+    // Create vector S'
+    vector<int> sol1;
+    sol1.resize(dim);
 
     // Residue values for S, S', S''
-    int res = kk(sol);
+    int res = kk(inst, sol, repr);
     int res1;
     int res2 = res;
 
     for (int i = 0; i < iters; i++) {
         double cooling = pow(10, 10) * pow(0.8, floor(i / 300));
-        vector<long> sol1 = neighbor(sol, repr);
-        res1 = kk(sol1);
+        sol1 = neighbor(sol, sol1, dim, repr);
+        res1 = kk(inst, sol1, repr);
         // residue(S') < residue(S)
         if (res1 < res) {
             sol = sol1;
@@ -145,10 +170,9 @@ void anneal(vector<long>& inst, vector<long>& sol2, int iters, int repr) {
             res2 = res;
         }
     }
-    return;
 }
 
 int main(int argc, char* argv[]) {
-    int dims = 100;
+    int dim = 100;
     return 0;
 }
