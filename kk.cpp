@@ -7,6 +7,9 @@
 using namespace std;
 using namespace std::chrono;
 
+const int STD = 0;
+const int PP = 1;
+
 // TODO - vector vs array for storing solutions
 // TODO - implement random soln and neighbor generator for both representations
 
@@ -39,20 +42,52 @@ vector<long> randinst(int dim) {
 }
 
 // Returns random solution of given dimension and representation
-// TODO - feed in pointer to new rand solution instead of creating new vector
-vector<long> randsol(int dim, int repr) {}
+void randsol(vector<int>& newsol, int dim, int repr) {
+    // Initialize random number generator
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    std::mt19937 generator(seed);
+    // Standard representation
+    if (repr == STD) {
+        // Fill in vector with -1 and +1 with equal probability
+        std::bernoulli_distribution distribution(0.5);
+        for (int i = 0; i < dim; i++) {
+            if (distribution(generator) < 0.5) {
+                newsol[i] = -1;
+            } else {
+                newsol[i] = 1;
+            }
+        }
+    }
+    // Prepartioning representation
+    else {
+        std::uniform_int_distribution distribution(1, dim);
+        for (int i = 0; i < dim; i++) {
+            newsol[i] = distribution(generator);
+        }
+    }
+}
 
 // Returns neighboring solution for given representation
 // TODO - make copy of solution and return pointer
-vector<long> neighbor(vector<long>& sol, int repr) {}
+vector<long> neighbor(vector<int>& sol,
+                      vector<int>& newsol,
+                      int dims,
+                      int repr) {}
 
 // Karmarkar-Karp algorithm: returns residue of given input, representation.
 int kk(vector<long>& inpt) {}
 
 // Repeated random algorithm
-void rrand(vector<long>& inst, vector<long>& sol, int iters, int repr) {
+void rrand(vector<long>& inst,
+           vector<int>& sol,
+           int dims,
+           int iters,
+           int repr) {
+    vector<int> newsol;
+    newsol.resize(dims);
     for (int i = 0; i < iters; i++) {
-        vector<long> newsol = randsol(100, repr);
+        // Generate random solution
+        randsol(newsol, dims, repr);
         if (kk(newsol) < kk(sol)) {
             sol = newsol;
         }
@@ -61,9 +96,11 @@ void rrand(vector<long>& inst, vector<long>& sol, int iters, int repr) {
 }
 
 // Hill climbing algorithm
-void hc(vector<long>& inst, vector<long>& sol, int iters, int repr) {
+void hc(vector<long>& inst, vector<int>& sol, int dims, int iters, int repr) {
+    vector<int> newsol;
+    newsol.resize(dims);
     for (int i = 0; i < iters; i++) {
-        vector<long> newsol = neighbor(sol, repr);
+        neighbor(sol, newsol, dims, repr);
         if (kk(newsol) < kk(sol)) {
             sol = newsol;
         }
@@ -112,5 +149,6 @@ void anneal(vector<long>& inst, vector<long>& sol2, int iters, int repr) {
 }
 
 int main(int argc, char* argv[]) {
+    int dims = 100;
     return 0;
 }
