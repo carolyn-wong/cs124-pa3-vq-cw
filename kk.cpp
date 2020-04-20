@@ -98,8 +98,14 @@ void neighbor(vector<int>& sol, vector<int>& newsol, int dim, int repr) {
     }
 }
 
-// Karmarkar-Karp algorithm: returns residue of given input, representation.
-int kk(vector<long>& inst, vector<int>& sol, int repr) {}
+// Computes residue given a number partition instance and representation.
+int resid(vector<long>& inst, vector<int>& sol, int repr) {}
+
+// Karmarkar-Karp algorithm
+int kk(vector<long>& inst, int repr) {
+    // Sort instance, perform differencing on largest 2 elts
+    // TODO - implement heap?
+}
 
 // Repeated random algorithm
 void rrand(vector<long>& inst, vector<int>& sol, int dim, int iters, int repr) {
@@ -108,7 +114,7 @@ void rrand(vector<long>& inst, vector<int>& sol, int dim, int iters, int repr) {
     for (int i = 0; i < iters; i++) {
         // Generate random solution
         randsol(newsol, dim, repr);
-        if (kk(inst, newsol, repr) < kk(inst, sol, repr)) {
+        if (resid(inst, newsol, repr) < resid(inst, sol, repr)) {
             sol = newsol;
         }
     }
@@ -120,7 +126,7 @@ void hc(vector<long>& inst, vector<int>& sol, int dim, int iters, int repr) {
     newsol.resize(dim);
     for (int i = 0; i < iters; i++) {
         neighbor(sol, newsol, dim, repr);
-        if (kk(inst, newsol, repr) < kk(inst, sol, repr)) {
+        if (resid(inst, newsol, repr) < resid(inst, sol, repr)) {
             sol = newsol;
         }
     }
@@ -145,14 +151,14 @@ void anneal(vector<long>& inst,
     sol1.resize(dim);
 
     // Residue values for S, S', S''
-    int res = kk(inst, sol, repr);
+    int res = resid(inst, sol, repr);
     int res1;
     int res2 = res;
 
     for (int i = 0; i < iters; i++) {
         double cooling = pow(10, 10) * pow(0.8, floor(i / 300));
         sol1 = neighbor(sol, sol1, dim, repr);
-        res1 = kk(inst, sol1, repr);
+        res1 = resid(inst, sol1, repr);
         // residue(S') < residue(S)
         if (res1 < res) {
             sol = sol1;
@@ -172,7 +178,76 @@ void anneal(vector<long>& inst,
     }
 }
 
+// TODO - accept input file of 100 unsorted integers to run KK alg
+// TODO - write all time/res data to csv file
+// TODO - figure out how to compare res data for different algs
+// TOOD - consider pointers to alg functions to minimize repeated code?
 int main(int argc, char* argv[]) {
+    // Change test parameters here
     int dim = 100;
+    int numTrials = 100;
+    int numIters = 25000;
+
+    // Array of representations
+    int repr[2] = {STD, PP};
+
+    // Variables to store residue, NP instance, sol vectors
+    long res;
+    vector<long> randInst;
+    vector<int> sol;
+    randInst.resize(dim);
+    sol.resize(dim);
+
+    // Initialize timer
+    auto start = high_resolution_clock::now();
+    auto stop = high_resolution_clock::now();
+    auto duration = stop - start;
+
+    for (int i = 0; i < numTrials; i++) {
+        // Generate random instance
+        randinst(randInst, dim);
+
+        // KK algorithm
+        start = high_resolution_clock::now();
+        kk(randInst, dim);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        std::cout << duration.count() * 0.000001 << endl;
+        res = resid(randInst, sol, dim);
+        std::cout << res << endl;
+
+        // Execute algorithms for each representation
+        for (int rep : repr) {
+            // Repeated random
+            randsol(sol, dim, rep);
+            start = high_resolution_clock::now();
+            rrand(randInst, sol, dim, numIters, rep);
+            stop = high_resolution_clock::now();
+            duration = duration_cast<microseconds>(stop - start);
+            std::cout << duration.count() * 0.000001 << endl;
+            res = resid(randInst, sol, dim);
+            std::cout << res << endl;
+
+            // Hill climbing
+            randsol(sol, dim, rep);
+            start = high_resolution_clock::now();
+            hc(randInst, sol, dim, numIters, rep);
+            stop = high_resolution_clock::now();
+            duration = duration_cast<microseconds>(stop - start);
+            std::cout << duration.count() * 0.000001 << endl;
+            res = resid(randInst, sol, dim);
+            std::cout << res << endl;
+
+            // Simulated annealing
+            randsol(sol, dim, rep);
+            start = high_resolution_clock::now();
+            anneal(randInst, sol, dim, numIters, rep);
+            stop = high_resolution_clock::now();
+            duration = duration_cast<microseconds>(stop - start);
+            std::cout << duration.count() * 0.000001 << endl;
+            res = resid(randInst, sol, dim);
+            std::cout << res << endl;
+        }
+    }
     return 0;
 }
