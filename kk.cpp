@@ -178,7 +178,6 @@ void anneal(vector<long>& inst,
     }
 }
 
-// TODO - write all time/res data to csv file
 // TODO - figure out how to compare res data for different algs
 // TOOD - consider pointers to alg functions to minimize repeated code?
 int main(int argc, char* argv[]) {
@@ -188,6 +187,7 @@ int main(int argc, char* argv[]) {
     int numIters = 25000;
     ifstream infile;
     string file = "";
+    ofstream outfile;
     int option = 0;
 
     // Array of representations
@@ -230,6 +230,12 @@ int main(int argc, char* argv[]) {
     }
     // option 1: run all algorithms for numTrials random instances
     else {
+        outfile.open("pa3.csv");
+        outfile << "kk time, kk res, "
+                   "rr std time, rr std res, rr pp time, rr pp res, "
+                   "hc std time, hc std res, hc pp time, hc pp res, "
+                   "anneal std time, anneal std res, anneal pp time, anneal pp "
+                   "res,\n";
         for (int i = 0; i < numTrials; i++) {
             // Generate random instance
             randinst(npInst, dim);
@@ -239,9 +245,12 @@ int main(int argc, char* argv[]) {
             kk(npInst, dim);
             stop = high_resolution_clock::now();
             duration = duration_cast<microseconds>(stop - start);
-            std::cout << duration.count() * 0.000001 << endl;
             res = resid(npInst, sol, dim);
+            // Output data
+            std::cout << duration.count() * 0.000001 << endl;
             std::cout << res << endl;
+            // outfile << duration.count() * 0.000001;
+            // outfile << res;
 
             // Execute algorithms for each representation
             for (int rep : repr) {
@@ -251,9 +260,12 @@ int main(int argc, char* argv[]) {
                 rrand(npInst, sol, dim, numIters, rep);
                 stop = high_resolution_clock::now();
                 duration = duration_cast<microseconds>(stop - start);
-                std::cout << duration.count() * 0.000001 << endl;
                 res = resid(npInst, sol, dim);
+                // Output data
+                std::cout << duration.count() * 0.000001 << endl;
                 std::cout << res << endl;
+                // outfile << duration.count() * 0.000001;
+                // outfile << res;
 
                 // Hill climbing
                 randsol(sol, dim, rep);
@@ -261,9 +273,12 @@ int main(int argc, char* argv[]) {
                 hc(npInst, sol, dim, numIters, rep);
                 stop = high_resolution_clock::now();
                 duration = duration_cast<microseconds>(stop - start);
-                std::cout << duration.count() * 0.000001 << endl;
                 res = resid(npInst, sol, dim);
+                // Output data
+                std::cout << duration.count() * 0.000001 << endl;
                 std::cout << res << endl;
+                // outfile << duration.count() * 0.000001;
+                // outfile << res;
 
                 // Simulated annealing
                 randsol(sol, dim, rep);
@@ -271,11 +286,15 @@ int main(int argc, char* argv[]) {
                 anneal(npInst, sol, dim, numIters, rep);
                 stop = high_resolution_clock::now();
                 duration = duration_cast<microseconds>(stop - start);
-                std::cout << duration.count() * 0.000001 << endl;
                 res = resid(npInst, sol, dim);
+                // Output data
+                std::cout << duration.count() * 0.000001 << endl;
                 std::cout << res << endl;
+                // outfile << duration.count() * 0.000001;
+                // outfile << res;
             }
         }
+        outfile.close();
     }
     return 0;
 }
