@@ -102,7 +102,7 @@ void neighbor(vector<int>& sol, vector<int>& newsol, int dim, int repr) {
 int resid(vector<long>& inst, vector<int>& sol, int repr) {}
 
 // Karmarkar-Karp algorithm
-int kk(vector<long>& inst, int repr) {
+int kk(vector<long>& inst, int dim) {
     // Sort instance, perform differencing on largest 2 elts
     // TODO - implement heap?
 }
@@ -178,24 +178,26 @@ void anneal(vector<long>& inst,
     }
 }
 
-// TODO - accept input file of 100 unsorted integers to run KK alg
 // TODO - write all time/res data to csv file
 // TODO - figure out how to compare res data for different algs
 // TOOD - consider pointers to alg functions to minimize repeated code?
 int main(int argc, char* argv[]) {
-    // Change test parameters here
+    // User input + defaults
     int dim = 100;
     int numTrials = 100;
     int numIters = 25000;
+    ifstream infile;
+    string file = "";
+    int option = 0;
 
     // Array of representations
     int repr[2] = {STD, PP};
 
     // Variables to store residue, NP instance, sol vectors
     long res;
-    vector<long> randInst;
+    vector<long> npInst;
     vector<int> sol;
-    randInst.resize(dim);
+    npInst.resize(dim);
     sol.resize(dim);
 
     // Initialize timer
@@ -203,50 +205,76 @@ int main(int argc, char* argv[]) {
     auto stop = high_resolution_clock::now();
     auto duration = stop - start;
 
-    for (int i = 0; i < numTrials; i++) {
-        // Generate random instance
-        randinst(randInst, dim);
+    // option 0: kk.exe [input file] - test input
+    // option 1: kk.exe [dimension] [numTrials] [numIters]
+    if (argc == 2) {
+        file = argv[1];
+    } else {
+        dim = strtol(argv[1], NULL, 10);
+        numTrials = strtol(argv[2], NULL, 10);
+        numIters = strtol(argv[3], NULL, 10);
+        option = 1;
+    }
 
-        // KK algorithm
-        start = high_resolution_clock::now();
-        kk(randInst, dim);
-        stop = high_resolution_clock::now();
-        duration = duration_cast<microseconds>(stop - start);
-        std::cout << duration.count() * 0.000001 << endl;
-        res = resid(randInst, sol, dim);
-        std::cout << res << endl;
+    // option 0: run kk algorithm on input file
+    if (option == 0) {
+        // Read numerical values from file
+        infile.open(file);
+        int temp = 0;
+        for (int i = 0; i < dim; i++) {
+            infile >> temp;
+            npInst[i] = temp;
+        }
+        kk(npInst, dim);
+        // TOOD - print result for kk algorithm
+    }
+    // option 1: run all algorithms for numTrials random instances
+    else {
+        for (int i = 0; i < numTrials; i++) {
+            // Generate random instance
+            randinst(npInst, dim);
 
-        // Execute algorithms for each representation
-        for (int rep : repr) {
-            // Repeated random
-            randsol(sol, dim, rep);
+            // KK algorithm
             start = high_resolution_clock::now();
-            rrand(randInst, sol, dim, numIters, rep);
+            kk(npInst, dim);
             stop = high_resolution_clock::now();
             duration = duration_cast<microseconds>(stop - start);
             std::cout << duration.count() * 0.000001 << endl;
-            res = resid(randInst, sol, dim);
+            res = resid(npInst, sol, dim);
             std::cout << res << endl;
 
-            // Hill climbing
-            randsol(sol, dim, rep);
-            start = high_resolution_clock::now();
-            hc(randInst, sol, dim, numIters, rep);
-            stop = high_resolution_clock::now();
-            duration = duration_cast<microseconds>(stop - start);
-            std::cout << duration.count() * 0.000001 << endl;
-            res = resid(randInst, sol, dim);
-            std::cout << res << endl;
+            // Execute algorithms for each representation
+            for (int rep : repr) {
+                // Repeated random
+                randsol(sol, dim, rep);
+                start = high_resolution_clock::now();
+                rrand(npInst, sol, dim, numIters, rep);
+                stop = high_resolution_clock::now();
+                duration = duration_cast<microseconds>(stop - start);
+                std::cout << duration.count() * 0.000001 << endl;
+                res = resid(npInst, sol, dim);
+                std::cout << res << endl;
 
-            // Simulated annealing
-            randsol(sol, dim, rep);
-            start = high_resolution_clock::now();
-            anneal(randInst, sol, dim, numIters, rep);
-            stop = high_resolution_clock::now();
-            duration = duration_cast<microseconds>(stop - start);
-            std::cout << duration.count() * 0.000001 << endl;
-            res = resid(randInst, sol, dim);
-            std::cout << res << endl;
+                // Hill climbing
+                randsol(sol, dim, rep);
+                start = high_resolution_clock::now();
+                hc(npInst, sol, dim, numIters, rep);
+                stop = high_resolution_clock::now();
+                duration = duration_cast<microseconds>(stop - start);
+                std::cout << duration.count() * 0.000001 << endl;
+                res = resid(npInst, sol, dim);
+                std::cout << res << endl;
+
+                // Simulated annealing
+                randsol(sol, dim, rep);
+                start = high_resolution_clock::now();
+                anneal(npInst, sol, dim, numIters, rep);
+                stop = high_resolution_clock::now();
+                duration = duration_cast<microseconds>(stop - start);
+                std::cout << duration.count() * 0.000001 << endl;
+                res = resid(npInst, sol, dim);
+                std::cout << res << endl;
+            }
         }
     }
     return 0;
