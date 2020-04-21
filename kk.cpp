@@ -157,7 +157,7 @@ void anneal(vector<long>& inst,
 
     for (int i = 0; i < iters; i++) {
         double cooling = pow(10, 10) * pow(0.8, floor(i / 300));
-        sol1 = neighbor(sol, sol1, dim, repr);
+        neighbor(sol, sol1, dim, repr);
         res1 = resid(inst, sol1, repr);
         // residue(S') < residue(S)
         if (res1 < res) {
