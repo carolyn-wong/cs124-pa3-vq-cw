@@ -7,26 +7,92 @@
 using namespace std;
 using namespace std::chrono;
 
+// Heap indexing functions
+int parent(int i){
+  return ((i-1) / 2);
+}
+
+int left(int i){
+  return (2*i + 1);
+}
+
+int right(int i){
+  return (2 * i + 2);
+}
+
+// Insert into heap
+int insert(vector<long> &heap, long val){
+  heap.push_back(val);    // stick new value at the end
+  int index = heap.size() - 1;
+
+  long temp;
+  while(index != 0 && heap[parent(index)] < heap[index]){   //bubble while parents are smaller
+    temp = heap[parent(index)];   // swapping steps
+    heap[parent(index)] = heap[index];
+    heap[index] = temp;
+
+    index = parent(index);
+  }
+}
+
+// Max the Heap, make sure it follows the property
+void maxHeapify(vector<long> &heap, int root){
+  int smallest = root;
+  int left_i = left(root);
+  int right_i = right(root);
+
+  // find index of smallest element at the top
+  if(left_i < heap.size() && heap[left_i] > heap[root]){
+    smallest = left_i;
+  } else {
+    smallest = root;
+  }
+
+  if(right_i < heap.size() && heap[right_i] > heap[smallest]){
+    smallest = right_i;
+  }
+
+  long temp;
+  if(smallest != root){   //bubble while parents are smaller
+    temp = heap[parent(smallest)];   // swapping steps
+    heap[parent(smallest)] = heap[smallest];
+    heap[smallest] = temp;
+
+    //MinHeapify again
+    maxHeapify(heap, smallest);
+  }
+
+}
+
+// pop the root of the heap
+long deleteMax(vector<long> &heap){
+  long max = heap[0];
+
+  heap[0] = heap.back();
+  heap.pop_back();
+
+  maxHeapify(heap, 0);
+  return (max);
+}
+
+
 int kk(vector<long>& inst, int dim){     // inst is the matrix, dim is size of it
 
-  priority_queue<long> q;
+  vector<long> heap;
   for(int i = 0; i < dim; i++){
-    q.push(inst[i]);
+    insert(heap, inst[i]);
   }
 
-  // while(!q.empty()) {
-  //   std::cout << q.top() << " ";
-  //   q.pop();
+  // for(int i = 0; i < heap.size(); i++){
+  //   cout << heap[i] << "\t" << i << endl;
   // }
-  // std::cout << '\n';
-  while(q.size() > 1){
-    long p1 = q.top(); q.pop();
-    long p2 = q.top(); q.pop();
-
-    q.push(abs(p1 - p2));
+  while(heap.size() > 1){
+    long p1 = deleteMax(heap);
+    long p2 = deleteMax(heap);
+    insert(heap, abs(p1-p2));
   }
 
-  return q.top();
+  return(heap[0]);
 }
 
 int main(){
