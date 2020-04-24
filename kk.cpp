@@ -6,6 +6,8 @@
 #include <numeric>
 #include <random>
 
+#include "kk_implement.cpp"
+
 using namespace std;
 using namespace std::chrono;
 
@@ -98,14 +100,14 @@ void neighbor(vector<int>& sol, vector<int>& newsol, int dim, int repr) {
     }
 }
 
-// Computes residue given a number partition instance and representation.
-int resid(vector<long>& inst, vector<int>& sol, int repr) {}
+// // Computes residue given a number partition instance and representation.
+// int resid(vector<long>& inst, vector<int>& sol, int repr) {}
 
-// Karmarkar-Karp algorithm
-int kk(vector<long>& inst, int dim) {
-    // Sort instance, perform differencing on largest 2 elts
-    // TODO - implement heap?
-}
+// // Karmarkar-Karp algorithm
+// int kk(vector<long>& inst, int dim) {
+//     // Sort instance, perform differencing on largest 2 elts
+//     // TODO - implement heap?
+// }
 
 // Repeated random algorithm
 void rrand(vector<long>& inst, vector<int>& sol, int dim, int iters, int repr) {
@@ -230,7 +232,7 @@ int main(int argc, char* argv[]) {
         switch (alg) {
             // Karmarkar-Karp
             case 0:
-                kk(npInst, dim);
+                kk(npInst);
                 break;
             // Repeated random
             case 1:
@@ -258,7 +260,7 @@ int main(int argc, char* argv[]) {
                 break;
             // Default to KK
             default:
-                kk(npInst, dim);
+                kk(npInst);
         }
         // TOOD - print result for kk algorithm
     }
@@ -276,15 +278,15 @@ int main(int argc, char* argv[]) {
 
             // KK algorithm
             start = high_resolution_clock::now();
-            kk(npInst, dim);
+            kk(npInst);
             stop = high_resolution_clock::now();
             duration = duration_cast<microseconds>(stop - start);
             res = resid(npInst, sol, dim);
             // Output data
-            std::cout << duration.count() * 0.000001 << endl;
-            std::cout << res << endl;
-            // outfile << duration.count() * 0.000001;
-            // outfile << res;
+            // std::cout << duration.count() * 0.000001 << endl;
+            // std::cout << res << endl;
+            outfile << duration.count() * 0.000001 << ",";
+            outfile << res << ",";
 
             // Execute algorithms for each representation
             for (int rep : repr) {
@@ -296,10 +298,10 @@ int main(int argc, char* argv[]) {
                 duration = duration_cast<microseconds>(stop - start);
                 res = resid(npInst, sol, dim);
                 // Output data
-                std::cout << duration.count() * 0.000001 << endl;
-                std::cout << res << endl;
-                // outfile << duration.count() * 0.000001;
-                // outfile << res;
+                // std::cout << duration.count() * 0.000001 << endl;
+                // std::cout << res << endl;
+                outfile << duration.count() * 0.000001 << ",";
+                outfile << res << ",";
 
                 // Hill climbing
                 randsol(sol, dim, rep);
@@ -309,10 +311,10 @@ int main(int argc, char* argv[]) {
                 duration = duration_cast<microseconds>(stop - start);
                 res = resid(npInst, sol, dim);
                 // Output data
-                std::cout << duration.count() * 0.000001 << endl;
-                std::cout << res << endl;
-                // outfile << duration.count() * 0.000001;
-                // outfile << res;
+                // std::cout << duration.count() * 0.000001 << endl;
+                // std::cout << res << endl;
+                outfile << duration.count() * 0.000001 << ",";
+                outfile << res << ",";
 
                 // Simulated annealing
                 randsol(sol, dim, rep);
@@ -322,10 +324,10 @@ int main(int argc, char* argv[]) {
                 duration = duration_cast<microseconds>(stop - start);
                 res = resid(npInst, sol, dim);
                 // Output data
-                std::cout << duration.count() * 0.000001 << endl;
-                std::cout << res << endl;
-                // outfile << duration.count() * 0.000001;
-                // outfile << res;
+                // std::cout << duration.count() * 0.000001 << endl;
+                // std::cout << res << endl;
+                outfile << duration.count() * 0.000001 << ",";
+                outfile << res << ",";
             }
         }
         outfile.close();
