@@ -188,7 +188,8 @@ int main(int argc, char* argv[]) {
     ifstream infile;
     string file = "";
     ofstream outfile;
-    int option = 0;
+    int flag = 0;
+    int alg = 0;
 
     // Array of representations
     int repr[2] = {STD, PP};
@@ -205,19 +206,20 @@ int main(int argc, char* argv[]) {
     auto stop = high_resolution_clock::now();
     auto duration = stop - start;
 
-    // option 0: kk.exe [input file] - test input
-    // option 1: kk.exe [dimension] [numTrials] [numIters]
-    if (argc == 2) {
-        file = argv[1];
+    // flag 0: partition.exe [flag] [alg] [input file] - test input
+    // flag 1: partition.exe [flag] [dimension] [numTrials] [numIters]
+    if (argv[1] == 0) {
+        alg = strtol(argv[2], NULL, 10);
+        file = argv[3];
     } else {
-        dim = strtol(argv[1], NULL, 10);
-        numTrials = strtol(argv[2], NULL, 10);
-        numIters = strtol(argv[3], NULL, 10);
-        option = 1;
+        dim = strtol(argv[2], NULL, 10);
+        numTrials = strtol(argv[3], NULL, 10);
+        numIters = strtol(argv[4], NULL, 10);
+        flag = 1;
     }
 
-    // option 0: run kk algorithm on input file
-    if (option == 0) {
+    // flag 0: run specified algorithm on input file
+    if (flag == 0) {
         // Read numerical values from file
         infile.open(file);
         int temp = 0;
@@ -225,10 +227,42 @@ int main(int argc, char* argv[]) {
             infile >> temp;
             npInst[i] = temp;
         }
-        kk(npInst, dim);
+        switch (alg) {
+            // Karmarkar-Karp
+            case 0:
+                kk(npInst, dim);
+                break;
+            // Repeated random
+            case 1:
+                rrand(npInst, sol, dim, numIters, STD);
+                break;
+            // Hill climbing
+            case 2:
+                hc(npInst, sol, dim, numIters, STD);
+                break;
+            // Simulated annealing
+            case 3:
+                anneal(npInst, sol, dim, numIters, STD);
+                break;
+            // Prepartitioned RR
+            case 11:
+                rrand(npInst, sol, dim, numIters, PP);
+                break;
+            // Prepartitioned HC
+            case 12:
+                hc(npInst, sol, dim, numIters, PP);
+                break;
+            // Prepartitioned SA
+            case 13:
+                anneal(npInst, sol, dim, numIters, PP);
+                break;
+            // Default to KK
+            default:
+                kk(npInst, dim);
+        }
         // TOOD - print result for kk algorithm
     }
-    // option 1: run all algorithms for numTrials random instances
+    // flag 1: run all algorithms for numTrials random instances
     else {
         outfile.open("pa3.csv");
         outfile << "kk time, kk res, "
