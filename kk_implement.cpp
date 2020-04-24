@@ -101,8 +101,9 @@ int resid(vector<long>& inst, vector<int>& sol, int repr) {
   if(repr == 0){
     long sum = 0;
 
+    // Iterate through all numbers and multiply by its solution
     for(int i = 0; i < inst.size(); i++){
-      sum += inst[i];
+      sum += sol[i]*inst[i];
     }
     return(sum);
   } else {
@@ -144,8 +145,8 @@ int resid(vector<long>& inst, vector<int>& sol, int repr) {
 int main(){
 
   vector<long> inst = {10, 6, 7, 5, 8};
-  vector<int> sol = {1, 2, 2, 4, 5};
-  cout << resid(inst, sol, 1) << endl;
+  vector<int> sol = {1, -1, -1, -1, 1};
+  cout << resid(inst, sol, 0) << endl;
   // cout << kk(inst) << endl;
 
   return 0;
