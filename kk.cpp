@@ -14,9 +14,12 @@ using namespace std::chrono;
 const int STD = 0;
 const int PP = 1;
 
-// TODO - vector vs array for storing solutions
-// TODO - implement KK algorithm
 // TODO - improve efficiency of generating random indices in range [1, n]
+// TODO - consider pointers to alg functions to minimize repeated code?
+
+// Residue function. Compute residue given a number partition instance and
+// representation.
+// Karmarkar-Karp algorithm
 
 // Vector printing function for readability and debugging
 void print_mat(vector<long>& vc, int dimension) {
@@ -125,15 +128,6 @@ void neighbor(vector<int>& sol, vector<int>& newsol, int dim, int repr) {
     }
 }
 
-// // Computes residue given a number partition instance and representation.
-// int resid(vector<long>& inst, vector<int>& sol, int repr) {}
-
-// // Karmarkar-Karp algorithm
-// int kk(vector<long>& inst, int dim) {
-//     // Sort instance, perform differencing on largest 2 elts
-//     // TODO - implement heap?
-// }
-
 // Repeated random algorithm
 void rrand(vector<long>& inst, vector<int>& sol, int dim, int iters, int repr) {
     vector<int> newsol;
@@ -207,8 +201,6 @@ void anneal(vector<long>& inst,
     }
 }
 
-// TODO - figure out how to compare res data for different algs
-// TOOD - consider pointers to alg functions to minimize repeated code?
 int main(int argc, char* argv[]) {
     // User input + defaults
     int dim = 100;
@@ -289,7 +281,6 @@ int main(int argc, char* argv[]) {
             default:
                 kk(npInst);
         }
-        // TOOD - print result for kk algorithm
     }
     // flag 1: run all algorithms for numTrials random instances
     else if (flag == 1) {
@@ -310,8 +301,6 @@ int main(int argc, char* argv[]) {
             duration = duration_cast<microseconds>(stop - start);
             res = kk(npInst);
             // Output data
-            // std::cout << duration.count() * 0.000001 << endl;
-            // std::cout << "KK\n" << res << endl;
             outfile << duration.count() * 0.000001 << ",";
             outfile << res << ",";
 
@@ -325,10 +314,6 @@ int main(int argc, char* argv[]) {
                 duration = duration_cast<microseconds>(stop - start);
                 res = resid(npInst, sol, dim);
                 // Output data
-                // std::cout << duration.count() * 0.000001 << endl;
-                // std::cout << "RR " << rep << "\n";
-                // std::cout << res << endl;
-                // print_mat(sol, dim);
                 outfile << duration.count() * 0.000001 << ",";
                 outfile << res << ",";
 
@@ -340,10 +325,6 @@ int main(int argc, char* argv[]) {
                 duration = duration_cast<microseconds>(stop - start);
                 res = resid(npInst, sol, dim);
                 // Output data
-                // std::cout << duration.count() * 0.000001 << endl;
-                // std::cout << "HC " << rep << "\n";
-                // std::cout << res << endl;
-                // print_mat(sol, dim);
                 outfile << duration.count() * 0.000001 << ",";
                 outfile << res << ",";
 
@@ -355,30 +336,12 @@ int main(int argc, char* argv[]) {
                 duration = duration_cast<microseconds>(stop - start);
                 res = resid(npInst, sol, dim);
                 // Output data
-                // std::cout << duration.count() * 0.000001 << endl;
-                // std::cout << "SA " << rep << "\n";
-                // std::cout << res << endl;
-                // print_mat(sol, dim);
                 outfile << duration.count() * 0.000001 << ",";
                 outfile << res << ",";
             }
             outfile << "\n";
         }
         outfile.close();
-    }
-    // flag 2: test residual function
-    else if (flag == 2) {
-        // Generate and print random instance
-        randinst(npInst, dim);
-        print_mat(npInst, dim);
-
-        // Generate and print random solution
-        randsol(sol, dim, STD);
-        print_mat(sol, dim);
-
-        // Print residue
-        res = resid(npInst, sol, STD);
-        std::cout << res << "\n";
     }
     return 0;
 }
