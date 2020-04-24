@@ -26,14 +26,24 @@ void print_mat(vector<long>& vc, int dimension) {
     cout << endl;
 }
 
+// Vector printing function for readability and debugging
+void print_mat(vector<int>& vc, int dimension) {
+    for (int i = 0; i < dimension; i++) {
+        cout << vc[i] << "\t";
+    }
+    cout << endl;
+}
+
 // Generate random instance of number partition problem of given dims
 void randinst(vector<long>& inst, int dim) {
+    // long maxval = long(pow(10, 12));
+    long maxval = long(50);
+
     // Define random number generator
     unsigned seed = chrono::system_clock::now().time_since_epoch().count();
     mt19937_64 generator(seed);
 
     // Initialize distribution
-    long maxval = long(pow(10, 12));
     std::uniform_int_distribution<long> distribution(1, maxval);
 
     // Fill solution with random values
@@ -78,7 +88,7 @@ void neighbor(vector<int>& sol, vector<int>& newsol, int dim, int repr) {
     // TODO - see if can make this more efficient
     vector<int> randInd;
     randInd.resize(dim);
-    iota(randInd.begin(), randInd.end(), 1);
+    iota(randInd.begin(), randInd.end(), 0);
     shuffle(randInd.begin(), randInd.end(), generator);
 
     // Choose two random indices i, j from [1, n] with i != j
@@ -89,14 +99,29 @@ void neighbor(vector<int>& sol, vector<int>& newsol, int dim, int repr) {
     if (repr == STD) {
         std::bernoulli_distribution distribution(0.5);
         // Set si to -si, set sj to -sj with probability 0.5
-        newsol[i] = -1 * newsol[i];
-        if (distribution(generator) < 0.5) {
-            newsol[j] = -1 * newsol[j];
+        for (int k = 0; k < dim; k++) {
+            if (k == i) {
+                newsol[k] = -1 * sol[i];
+            } else if (k == j) {
+                if (distribution(generator) < 0.5) {
+                    newsol[k] = -1 * sol[j];
+                } else {
+                    newsol[k] = sol[j];
+                }
+            } else {
+                newsol[k] = sol[k];
+            }
         }
     }
     // Prepartioning representation
     else {
-        newsol[i] = j;
+        for (int k = 0; k < dim; k++) {
+            if (k == i) {
+                newsol[k] = j;
+            } else {
+                newsol[k] = sol[k];
+            }
+        }
     }
 }
 
@@ -126,6 +151,7 @@ void rrand(vector<long>& inst, vector<int>& sol, int dim, int iters, int repr) {
 void hc(vector<long>& inst, vector<int>& sol, int dim, int iters, int repr) {
     vector<int> newsol;
     newsol.resize(dim);
+
     for (int i = 0; i < iters; i++) {
         neighbor(sol, newsol, dim, repr);
         if (resid(inst, newsol, repr) < resid(inst, sol, repr)) {
@@ -148,6 +174,7 @@ void anneal(vector<long>& inst,
     // Create S by copying original random solution S''
     // TODO see if can avoid copying values into new vector
     vector<int> sol(sol2.begin(), sol2.end());
+
     // Create vector S'
     vector<int> sol1;
     sol1.resize(dim);
@@ -196,13 +223,6 @@ int main(int argc, char* argv[]) {
     // Array of representations
     int repr[2] = {STD, PP};
 
-    // Variables to store residue, NP instance, sol vectors
-    long res;
-    vector<long> npInst;
-    vector<int> sol;
-    npInst.resize(dim);
-    sol.resize(dim);
-
     // Initialize timer
     auto start = high_resolution_clock::now();
     auto stop = high_resolution_clock::now();
@@ -217,8 +237,15 @@ int main(int argc, char* argv[]) {
         dim = strtol(argv[2], NULL, 10);
         numTrials = strtol(argv[3], NULL, 10);
         numIters = strtol(argv[4], NULL, 10);
-        flag = 1;
+        flag = strtol(argv[1], NULL, 10);
     }
+
+    // Variables to store residue, NP instance, sol vectors
+    long res;
+    vector<long> npInst;
+    vector<int> sol;
+    npInst.resize(dim);
+    sol.resize(dim);
 
     // flag 0: run specified algorithm on input file
     if (flag == 0) {
@@ -265,7 +292,7 @@ int main(int argc, char* argv[]) {
         // TOOD - print result for kk algorithm
     }
     // flag 1: run all algorithms for numTrials random instances
-    else {
+    else if (flag == 1) {
         outfile.open("pa3.csv");
         outfile << "kk time, kk res, "
                    "rr std time, rr std res, rr pp time, rr pp res, "
@@ -281,10 +308,10 @@ int main(int argc, char* argv[]) {
             kk(npInst);
             stop = high_resolution_clock::now();
             duration = duration_cast<microseconds>(stop - start);
-            res = resid(npInst, sol, dim);
+            res = kk(npInst);
             // Output data
             // std::cout << duration.count() * 0.000001 << endl;
-            // std::cout << res << endl;
+            // std::cout << "KK\n" << res << endl;
             outfile << duration.count() * 0.000001 << ",";
             outfile << res << ",";
 
@@ -299,7 +326,9 @@ int main(int argc, char* argv[]) {
                 res = resid(npInst, sol, dim);
                 // Output data
                 // std::cout << duration.count() * 0.000001 << endl;
+                // std::cout << "RR " << rep << "\n";
                 // std::cout << res << endl;
+                // print_mat(sol, dim);
                 outfile << duration.count() * 0.000001 << ",";
                 outfile << res << ",";
 
@@ -312,7 +341,9 @@ int main(int argc, char* argv[]) {
                 res = resid(npInst, sol, dim);
                 // Output data
                 // std::cout << duration.count() * 0.000001 << endl;
+                // std::cout << "HC " << rep << "\n";
                 // std::cout << res << endl;
+                // print_mat(sol, dim);
                 outfile << duration.count() * 0.000001 << ",";
                 outfile << res << ",";
 
@@ -325,12 +356,29 @@ int main(int argc, char* argv[]) {
                 res = resid(npInst, sol, dim);
                 // Output data
                 // std::cout << duration.count() * 0.000001 << endl;
+                // std::cout << "SA " << rep << "\n";
                 // std::cout << res << endl;
+                // print_mat(sol, dim);
                 outfile << duration.count() * 0.000001 << ",";
                 outfile << res << ",";
             }
+            outfile << "\n";
         }
         outfile.close();
+    }
+    // flag 2: test residual function
+    else if (flag == 2) {
+        // Generate and print random instance
+        randinst(npInst, dim);
+        print_mat(npInst, dim);
+
+        // Generate and print random solution
+        randsol(sol, dim, STD);
+        print_mat(sol, dim);
+
+        // Print residue
+        res = resid(npInst, sol, STD);
+        std::cout << res << "\n";
     }
     return 0;
 }

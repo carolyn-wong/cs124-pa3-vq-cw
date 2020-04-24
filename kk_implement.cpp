@@ -101,10 +101,11 @@ int resid(vector<long>& inst, vector<int>& sol, int repr) {
     if (repr == 0) {
         long sum = 0;
 
+        // Iterate through all numbers and multiply by its solution
         for (int i = 0; i < inst.size(); i++) {
-            sum += inst[i];
+            sum += sol[i] * inst[i];
         }
-        return (sum);
+        return abs(sum);
     } else {
         // Use a map to find the unique groups in the array
         map<int, long> prepar;
@@ -126,10 +127,10 @@ int resid(vector<long>& inst, vector<int>& sol, int repr) {
         }
 
         for (int i = 0; i < out.size(); i++) {
-            cout << out[i] << "\t" << endl;
+            // cout << out[i] << "\t" << endl;
         }
 
-        // Run the KK algorithm
+        // Run specified algorithm
         return (kk(out));
     }
 }
