@@ -21,11 +21,11 @@ int right(int i) {
 }
 
 // Insert into heap
-int insert(vector<long>& heap, long val) {
+void insert(vector<long long>& heap, long long val) {
     heap.push_back(val);  // stick new value at the end
     int index = heap.size() - 1;
 
-    long temp;
+    long long temp;
     while (index != 0 && heap[parent(index)] <
                              heap[index]) {  // bubble while parents are smaller
         temp = heap[parent(index)];          // swapping steps
@@ -37,7 +37,7 @@ int insert(vector<long>& heap, long val) {
 }
 
 // Max the Heap, make sure it follows the property
-void maxHeapify(vector<long>& heap, int root) {
+void maxHeapify(vector<long long>& heap, int root) {
     int smallest = root;
     int left_i = left(root);
     int right_i = right(root);
@@ -53,7 +53,7 @@ void maxHeapify(vector<long>& heap, int root) {
         smallest = right_i;
     }
 
-    long temp;
+    long long temp;
     if (smallest != root) {             // bubble while parents are smaller
         temp = heap[parent(smallest)];  // swapping steps
         heap[parent(smallest)] = heap[smallest];
@@ -65,8 +65,8 @@ void maxHeapify(vector<long>& heap, int root) {
 }
 
 // pop the root of the heap
-long deleteMax(vector<long>& heap) {
-    long max = heap[0];
+long long deleteMax(vector<long long>& heap) {
+    long long max = heap[0];
 
     heap[0] = heap.back();
     heap.pop_back();
@@ -75,9 +75,9 @@ long deleteMax(vector<long>& heap) {
     return (max);
 }
 
-int kk(vector<long>& inst) {  // inst is the matrix, dim is size of it
+long long kk(vector<long long>& inst) {  // inst is the matrix, dim is size of it
 
-    vector<long> heap;
+    vector<long long> heap;
     for (int i = 0; i < inst.size(); i++) {
         insert(heap, inst[i]);
     }
@@ -86,8 +86,8 @@ int kk(vector<long>& inst) {  // inst is the matrix, dim is size of it
     //   cout << heap[i] << "\t" << i << endl;
     // }
     while (heap.size() > 1) {
-        long p1 = deleteMax(heap);
-        long p2 = deleteMax(heap);
+        long long p1 = deleteMax(heap);
+        long long p2 = deleteMax(heap);
         insert(heap, abs(p1 - p2));
     }
 
@@ -97,20 +97,21 @@ int kk(vector<long>& inst) {  // inst is the matrix, dim is size of it
 // Computes residue given a number partition instance and representation.
 // inst is the elements, sol is the given solution, repr is type of
 // representation (0 is +/- 1, 1 is prepartition)
-int resid(vector<long>& inst, vector<int>& sol, int repr) {
+long long resid(vector<long long>& inst, vector<int>& sol, int repr) {
     if (repr == 0) {
-        long sum = 0;
+        long long sum = 0;
 
         // Iterate through all numbers and multiply by its solution
         for (int i = 0; i < inst.size(); i++) {
             sum += sol[i] * inst[i];
         }
-        return abs(sum);
+        // cout << "\t" << sum << "\t" << abs(sum) << endl;
+        return(abs(sum));
     } else {
         // Use a map to find the unique groups in the array
-        map<int, long> prepar;
+        map<int, long long> prepar;
         for (int i = 0; i < inst.size(); i++) {
-            map<int, long>::iterator find = prepar.find(sol[i]);
+            map<int, long long>::iterator find = prepar.find(sol[i]);
             if (find != prepar.end()) {
                 prepar[sol[i]] = prepar[sol[i]] + inst[i];
             } else {
@@ -119,28 +120,32 @@ int resid(vector<long>& inst, vector<int>& sol, int repr) {
         }
 
         // Push unique values into heap
-        vector<long> out;
-        map<int, long>::iterator vals = prepar.begin();
+        vector<long long> out;
+        map<int, long long>::iterator vals = prepar.begin();
         while (vals != prepar.end()) {
             out.push_back(vals->second);
             vals++;
         }
 
-        for (int i = 0; i < out.size(); i++) {
-            // cout << out[i] << "\t" << endl;
-        }
+        // for (int i = 0; i < out.size(); i++) {
+        //     // cout << out[i] << "\t" << endl;
+        // }
 
         // Run specified algorithm
         return (kk(out));
     }
 }
 
+
 // int main(){
-
-//   vector<long> inst = {10, 6, 7, 5, 8};
-//   vector<int> sol = {1, 2, 2, 4, 5};
-//   cout << resid(inst, sol, 1) << endl;
+//
+//   vector<long long> inst;
+//   vector<int> sol = {1, 2,2 ,4, 5};
+//   randinst(inst, 5);
+//   cout << "residual" << endl;
+//   long long out =  resid(inst, sol, 1);
+//   cout << out << endl;
 //   // cout << kk(inst) << endl;
-
+//
 //   return 0;
 // }

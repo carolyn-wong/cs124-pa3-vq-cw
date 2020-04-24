@@ -22,7 +22,7 @@ const int PP = 1;
 // Karmarkar-Karp algorithm
 
 // Vector printing function for readability and debugging
-void print_mat(vector<long>& vc, int dimension) {
+void print_mat(vector<long long>& vc, int dimension) {
     for (int i = 0; i < dimension; i++) {
         cout << vc[i] << "\t";
     }
@@ -38,16 +38,16 @@ void print_mat(vector<int>& vc, int dimension) {
 }
 
 // Generate random instance of number partition problem of given dims
-void randinst(vector<long>& inst, int dim) {
-    // long maxval = long(pow(10, 12));
-    long maxval = long(50);
+void randinst(vector<long long>& inst, int dim) {
+    long long maxval = long(pow(10, 12));
+    // long long maxval = long long(50);
 
     // Define random number generator
     unsigned seed = chrono::system_clock::now().time_since_epoch().count();
     mt19937_64 generator(seed);
 
     // Initialize distribution
-    std::uniform_int_distribution<long> distribution(1, maxval);
+    std::uniform_int_distribution<long long> distribution(1, maxval);
 
     // Fill solution with random values
     for (int i = 0; i < dim; i++) {
@@ -74,7 +74,7 @@ void randsol(vector<int>& newsol, int dim, int repr) {
     }
     // Prepartioning representation
     else {
-        std::uniform_int_distribution distribution(1, dim);
+        std::uniform_int_distribution<int> distribution(1, dim);
         for (int i = 0; i < dim; i++) {
             newsol[i] = distribution(generator);
         }
@@ -129,7 +129,7 @@ void neighbor(vector<int>& sol, vector<int>& newsol, int dim, int repr) {
 }
 
 // Repeated random algorithm
-void rrand(vector<long>& inst, vector<int>& sol, int dim, int iters, int repr) {
+void rrand(vector<long long>& inst, vector<int>& sol, int dim, int iters, int repr) {
     vector<int> newsol;
     newsol.resize(dim);
     for (int i = 0; i < iters; i++) {
@@ -142,7 +142,7 @@ void rrand(vector<long>& inst, vector<int>& sol, int dim, int iters, int repr) {
 }
 
 // Hill climbing algorithm
-void hc(vector<long>& inst, vector<int>& sol, int dim, int iters, int repr) {
+void hc(vector<long long>& inst, vector<int>& sol, int dim, int iters, int repr) {
     vector<int> newsol;
     newsol.resize(dim);
 
@@ -155,7 +155,7 @@ void hc(vector<long>& inst, vector<int>& sol, int dim, int iters, int repr) {
 }
 
 // Simulated annealing algorithm. Returns best solution sol2 seen so far.
-void anneal(vector<long>& inst,
+void anneal(vector<long long>& inst,
             vector<int>& sol2,
             int dim,
             int iters,
@@ -233,8 +233,8 @@ int main(int argc, char* argv[]) {
     }
 
     // Variables to store residue, NP instance, sol vectors
-    long res;
-    vector<long> npInst;
+    long long res;
+    vector<long long> npInst;
     vector<int> sol;
     npInst.resize(dim);
     sol.resize(dim);
