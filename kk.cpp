@@ -6,7 +6,7 @@
 #include <numeric>
 #include <random>
 
-#include "kk_implement.cpp"
+#include "kk_implement.h"
 
 using namespace std;
 using namespace std::chrono;
