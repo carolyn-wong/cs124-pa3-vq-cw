@@ -253,14 +253,14 @@ int main(int argc, char* argv[]) {
         // Read numerical values from file
         infile.open(file);
         char temp[256];
-        while(infile.getline(temp, 30)) {
+        while (infile.getline(temp, 30)) {
             npInst.push_back(stoll(temp));
         }
 
         switch (alg) {
             // Karmarkar-Karp
             case 0:
-                kk(npInst);
+                res = kk(npInst);
                 break;
             // Repeated random
             case 1:
@@ -288,8 +288,12 @@ int main(int argc, char* argv[]) {
                 break;
             // Default to KK
             default:
-                kk(npInst);
+                res = kk(npInst);
         }
+        if (alg != 0) {
+            res = resid(npInst, sol, dim);
+        }
+        std::cout << res;
     }
     // flag 1: run all algorithms for numTrials random instances
     else if (flag == 1) {
