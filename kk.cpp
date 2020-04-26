@@ -230,9 +230,10 @@ int main(int argc, char* argv[]) {
 
     // flag 0: partition.exe [flag] [alg] [input file] - test input
     // flag 1: partition.exe [flag] [dimension] [numTrials] [numIters]
-    if (argv[1] == 0) {
+    if (atoi(argv[1]) == 0) {
         alg = strtol(argv[2], NULL, 10);
         file = argv[3];
+        flag = strtol(argv[1], NULL, 10);
     } else {
         dim = strtol(argv[2], NULL, 10);
         numTrials = strtol(argv[3], NULL, 10);
@@ -244,18 +245,18 @@ int main(int argc, char* argv[]) {
     long long res;
     vector<long long> npInst;
     vector<int> sol;
-    npInst.resize(dim);
+    // npInst.resize(dim);
     sol.resize(dim);
 
     // flag 0: run specified algorithm on input file
     if (flag == 0) {
         // Read numerical values from file
         infile.open(file);
-        int temp = 0;
-        for (int i = 0; i < dim; i++) {
-            infile >> temp;
-            npInst[i] = temp;
+        char temp[256];
+        while(infile.getline(temp, 30)) {
+            npInst.push_back(stoll(temp));
         }
+
         switch (alg) {
             // Karmarkar-Karp
             case 0:
