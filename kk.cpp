@@ -33,7 +33,6 @@ void print_mat(vector<int>& vc, int dimension) {
 // Generate random instance of number partition problem of given dims
 void randinst(vector<long long>& inst, int dim) {
     long long maxval = (long long) (pow(10, 12));
-    // long long maxval = long long(50);
 
     // Define random number generator
     unsigned seed = chrono::system_clock::now().time_since_epoch().count();
@@ -203,6 +202,7 @@ void anneal(vector<long long>& inst,
 int main(int argc, char* argv[]) {
     // User input + defaults
     int dim = 100;
+    double avgVal = (double) 0.0;
     int numTrials = 100;
     int numIters = 25000;
     ifstream infile;
@@ -236,7 +236,7 @@ int main(int argc, char* argv[]) {
     long long res;
     vector<long long> npInst;
     vector<int> sol;
-    // npInst.resize(dim);
+    npInst.resize(dim);
     sol.resize(dim);
 
     // flag 0: run specified algorithm on input file
@@ -288,15 +288,21 @@ int main(int argc, char* argv[]) {
     }
     // flag 1: run all algorithms for numTrials random instances
     else if (flag == 1) {
-        outfile.open("pa3.csv");
+        outfile.open("pa3avg.csv");
         outfile << "kk time, kk res, "
                    "rr std time, rr std res, rr pp time, rr pp res, "
                    "hc std time, hc std res, hc pp time, hc pp res, "
                    "anneal std time, anneal std res, anneal pp time, anneal pp "
-                   "res,\n";
+                   "res, avg vector val\n";
         for (int i = 0; i < numTrials; i++) {
             // Generate random instance
             randinst(npInst, dim);
+
+            for (int ind = 0; ind < dim; ind++) {
+                avgVal += (double) npInst[ind];
+            }
+
+            avgVal = avgVal / (double) dim;
 
             // KK algorithm
             start = high_resolution_clock::now();
@@ -305,7 +311,7 @@ int main(int argc, char* argv[]) {
             duration = duration_cast<microseconds>(stop - start);
             res = kk(npInst);
             // Output data
-            outfile << duration.count() * 0.000001 << ",";
+            outfile << duration.count() * 0.001 << ",";
             outfile << res << ",";
 
             // Execute algorithms for each representation
@@ -318,7 +324,7 @@ int main(int argc, char* argv[]) {
                 duration = duration_cast<microseconds>(stop - start);
                 res = resid(npInst, sol, dim);
                 // Output data
-                outfile << duration.count() * 0.000001 << ",";
+                outfile << duration.count() * 0.001 << ",";
                 outfile << res << ",";
 
                 // Hill climbing
@@ -329,7 +335,7 @@ int main(int argc, char* argv[]) {
                 duration = duration_cast<microseconds>(stop - start);
                 res = resid(npInst, sol, dim);
                 // Output data
-                outfile << duration.count() * 0.000001 << ",";
+                outfile << duration.count() * 0.001 << ",";
                 outfile << res << ",";
 
                 // Simulated annealing
@@ -340,9 +346,10 @@ int main(int argc, char* argv[]) {
                 duration = duration_cast<microseconds>(stop - start);
                 res = resid(npInst, sol, dim);
                 // Output data
-                outfile << duration.count() * 0.000001 << ",";
+                outfile << duration.count() * 0.001 << ",";
                 outfile << res << ",";
             }
+            outfile << avgVal;
             outfile << "\n";
         }
         outfile.close();
