@@ -39,7 +39,7 @@ void print_mat(vector<int>& vc, int dimension) {
 
 // Generate random instance of number partition problem of given dims
 void randinst(vector<long long>& inst, int dim) {
-    long long maxval = long(pow(10, 12));
+    long long maxval = (long long) (pow(10, 12));
     // long long maxval = long long(50);
 
     // Define random number generator
@@ -129,7 +129,11 @@ void neighbor(vector<int>& sol, vector<int>& newsol, int dim, int repr) {
 }
 
 // Repeated random algorithm
-void rrand(vector<long long>& inst, vector<int>& sol, int dim, int iters, int repr) {
+void rrand(vector<long long>& inst,
+           vector<int>& sol,
+           int dim,
+           int iters,
+           int repr) {
     vector<int> newsol;
     newsol.resize(dim);
     for (int i = 0; i < iters; i++) {
@@ -142,7 +146,11 @@ void rrand(vector<long long>& inst, vector<int>& sol, int dim, int iters, int re
 }
 
 // Hill climbing algorithm
-void hc(vector<long long>& inst, vector<int>& sol, int dim, int iters, int repr) {
+void hc(vector<long long>& inst,
+        vector<int>& sol,
+        int dim,
+        int iters,
+        int repr) {
     vector<int> newsol;
     newsol.resize(dim);
 
