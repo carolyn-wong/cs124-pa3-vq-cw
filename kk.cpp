@@ -14,13 +14,6 @@ using namespace std::chrono;
 const int STD = 0;
 const int PP = 1;
 
-// TODO - improve efficiency of generating random indices in range [1, n]
-// TODO - consider pointers to alg functions to minimize repeated code?
-
-// Residue function. Compute residue given a number partition instance and
-// representation.
-// Karmarkar-Karp algorithm
-
 // Vector printing function for readability and debugging
 void print_mat(vector<long long>& vc, int dimension) {
     for (int i = 0; i < dimension; i++) {
@@ -88,7 +81,6 @@ void neighbor(vector<int>& sol, vector<int>& newsol, int dim, int repr) {
     std::mt19937 generator(seed);
 
     // Generate vector of values 1 through n
-    // TODO - see if can make this more efficient
     vector<int> randInd;
     randInd.resize(dim);
     iota(randInd.begin(), randInd.end(), 0);
@@ -174,7 +166,6 @@ void anneal(vector<long long>& inst,
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
     // Create S by copying original random solution S''
-    // TODO see if can avoid copying values into new vector
     vector<int> sol(sol2.begin(), sol2.end());
 
     // Create vector S'

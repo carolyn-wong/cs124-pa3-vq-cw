@@ -83,9 +83,6 @@ long long kk(
         insert(heap, inst[i]);
     }
 
-    // for(int i = 0; i < heap.size(); i++){
-    //   cout << heap[i] << "\t" << i << endl;
-    // }
     while (heap.size() > 1) {
         long long p1 = deleteMax(heap);
         long long p2 = deleteMax(heap);
@@ -128,24 +125,7 @@ long long resid(vector<long long>& inst, vector<int>& sol, int repr) {
             vals++;
         }
 
-        // for (int i = 0; i < out.size(); i++) {
-        //     // cout << out[i] << "\t" << endl;
-        // }
-
         // Run specified algorithm
         return (kk(out));
     }
 }
-
-// int main(){
-//
-//   vector<long long> inst;
-//   vector<int> sol = {1, 2,2 ,4, 5};
-//   randinst(inst, 5);
-//   cout << "residual" << endl;
-//   long long out =  resid(inst, sol, 1);
-//   cout << out << endl;
-//   // cout << kk(inst) << endl;
-//
-//   return 0;
-// }
