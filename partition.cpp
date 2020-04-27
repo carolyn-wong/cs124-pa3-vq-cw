@@ -176,8 +176,11 @@ void anneal(vector<long long>& inst,
     int res1;
     int res2 = res;
 
-    for (int i = 0; i < iters; i++) {
-        double cooling = pow(10, 10) * pow(0.8, floor(i / 300));
+    double cooling;
+    double prob;
+
+    for (int i = 1; i < iters + 1; i++) {
+        cooling = pow(10, 10) * pow(0.8, floor(i / 300));
         neighbor(sol, sol1, dim, repr);
         res1 = resid(inst, sol1, repr);
         // residue(S') < residue(S)
@@ -185,7 +188,7 @@ void anneal(vector<long long>& inst,
             sol = sol1;
             res = res1;
         } else {
-            double prob = exp(-(res1 - res) / cooling);
+            prob = exp(-(res1 - res) / cooling);
             if (distribution(generator) < prob) {
                 sol = sol1;
                 res = res1;
@@ -256,39 +259,42 @@ int main(int argc, char* argv[]) {
             case 1:
                 randsol(sol, dim, STD);
                 rrand(npInst, sol, dim, numIters, STD);
+                res = resid(npInst, sol, STD);
                 break;
             // Hill climbing
             case 2:
                 randsol(sol, dim, STD);
                 hc(npInst, sol, dim, numIters, STD);
+                res = resid(npInst, sol, STD);
                 break;
             // Simulated annealing
             case 3:
                 randsol(sol, dim, STD);
                 anneal(npInst, sol, dim, numIters, STD);
+                res = resid(npInst, sol, STD);
                 break;
             // Prepartitioned RR
             case 11:
                 randsol(sol, dim, PP);
                 rrand(npInst, sol, dim, numIters, PP);
+                res = resid(npInst, sol, PP);
                 break;
             // Prepartitioned HC
             case 12:
                 randsol(sol, dim, PP);
                 hc(npInst, sol, dim, numIters, PP);
+                res = resid(npInst, sol, PP);
                 break;
             // Prepartitioned SA
             case 13:
                 randsol(sol, dim, PP);
                 anneal(npInst, sol, dim, numIters, PP);
+                res = resid(npInst, sol, PP);
                 break;
             // Default to KK
             default:
                 std::cout << "default";
                 res = kk(npInst);
-        }
-        if (alg != 0) {
-            res = resid(npInst, sol, dim);
         }
         std::cout << res;
     }
