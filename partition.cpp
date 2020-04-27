@@ -172,9 +172,9 @@ void anneal(vector<long long>& inst,
     sol1.resize(dim);
 
     // Residue values for S, S', S''
-    int res = resid(inst, sol, repr);
-    int res1;
-    int res2 = res;
+    long long res = resid(inst, sol, repr);
+    long long res1;
+    long long res2 = res;
 
     double cooling;
     double prob;
