@@ -261,7 +261,6 @@ int main(int argc, char* argv[]) {
             case 2:
                 randsol(sol, dim, STD);
                 hc(npInst, sol, dim, numIters, STD);
-                print_mat(sol, dim);
                 break;
             // Simulated annealing
             case 3:
