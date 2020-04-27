@@ -236,7 +236,6 @@ int main(int argc, char* argv[]) {
     long long res;
     vector<long long> npInst;
     vector<int> sol;
-    npInst.resize(dim);
     sol.resize(dim);
 
     // flag 0: run specified algorithm on input file
@@ -255,30 +254,38 @@ int main(int argc, char* argv[]) {
                 break;
             // Repeated random
             case 1:
+                randsol(sol, dim, STD);
                 rrand(npInst, sol, dim, numIters, STD);
                 break;
             // Hill climbing
             case 2:
+                randsol(sol, dim, STD);
                 hc(npInst, sol, dim, numIters, STD);
+                print_mat(sol, dim);
                 break;
             // Simulated annealing
             case 3:
+                randsol(sol, dim, STD);
                 anneal(npInst, sol, dim, numIters, STD);
                 break;
             // Prepartitioned RR
             case 11:
+                randsol(sol, dim, PP);
                 rrand(npInst, sol, dim, numIters, PP);
                 break;
             // Prepartitioned HC
             case 12:
+                randsol(sol, dim, PP);
                 hc(npInst, sol, dim, numIters, PP);
                 break;
             // Prepartitioned SA
             case 13:
+                randsol(sol, dim, PP);
                 anneal(npInst, sol, dim, numIters, PP);
                 break;
             // Default to KK
             default:
+                std::cout << "default";
                 res = kk(npInst);
         }
         if (alg != 0) {
@@ -288,6 +295,7 @@ int main(int argc, char* argv[]) {
     }
     // flag 1: run all algorithms for numTrials random instances
     else if (flag == 1) {
+        npInst.resize(dim);
         outfile.open("pa3avg.csv");
         outfile << "kk time, kk res, "
                    "rr std time, rr std res, rr pp time, rr pp res, "
